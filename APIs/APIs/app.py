@@ -3,6 +3,9 @@ import random
 import json
 from flask_dance.contrib.github import make_github_blueprint , github
 import os 
+import templates
+import pprint
+
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
 app.config["SECRET_KEY"]="SECRET KEY  "
@@ -15,14 +18,17 @@ app.register_blueprint(github_blueprint, url_prefix='/github_login')
 
 @app.route('/')
 def github_login():
-
+    
+    templates="index.html"
     if not github.authorized:
         return redirect(url_for('github.login'))
     else:
         account_info = github.get('/user')
         if account_info.ok:
             account_info_json = account_info.json()
-            return '<h1>Nome do usuario {}<h1>'.format(account_info_json['login'])
+            usuario=account_info_json['login']
+            imagens=account_info_json['avatar_url']
+            return render_template(templates,usuario=usuario,imagens=imagens)
 
     return '<h1>Request failed!</h1>'
 
